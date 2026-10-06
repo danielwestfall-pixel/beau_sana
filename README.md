@@ -63,6 +63,8 @@ Open `gmail-bookmarklet.html` in a browser for installation and usage instructio
 
 For JAWS, refresh the virtual buffer with **Insert+Esc** in desktop layout or **Caps Lock+Esc** in laptop layout. The bookmarklet has not been verified in a signed-in Gmail account or with JAWS; message filtering expects English control labels.
 
+Hidden regions receive `aria-hidden="true"`, `inert`, inline hiding, and `tabindex="-1"` on focusable controls. The bookmarklet reapplies these when Gmail rerenders controls and restores their original attributes when switched off. This handling is intended to prevent screen-reader and keyboard access to hidden panels; a live JAWS trial is still required.
+
 To host the installer on a website, upload `gmail-bookmarklet.html`. Upload `gmail-simple.js` beside it for the optional readable-source link. No BeauSana server is needed. After changing the source, regenerate the installer with `node scripts/build-gmail-bookmarklet.mjs`; users must replace their saved bookmark to receive updates.
 
 ## App validation

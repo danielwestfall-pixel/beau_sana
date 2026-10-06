@@ -9,12 +9,12 @@
   if (window[key]) { window[key](); return; }
   const attribute = 'data-beausana-gmail-simple';
   const changed = new Map();
+  const focusChanged = new Map();
+  let desired = new Map();
   const previousFocus = document.activeElement;
   const style = document.createElement('style');
   style.textContent = `
     [${attribute}="panel"], [${attribute}="action"] { display:none !important; }
-    /* Gmail's app rail and message-star controls, including newly rendered rows. */
-    .bAw, .zA > td.apU, .T-KT { display:none !important; }
     [${attribute}="header"], [${attribute}="header"] * { visibility:hidden !important; }
     #beausana-gmail-simple-bar {
       position:fixed; top:8px; left:12px; z-index:2147483647;
@@ -44,24 +44,65 @@
   bar.append(inbox, restore);
 
   function remember(element, value) {
-    if (!changed.has(element)) changed.set(element, element.getAttribute(attribute));
+    if (!changed.has(element)) {
+      const property = value === 'header' ? 'visibility' : 'display';
+      changed.set(element, {
+        attributes: new Map([attribute, 'aria-hidden', 'inert', 'hidden'].map(name => [name, element.getAttribute(name)])),
+        property, cssValue: element.style.getPropertyValue(property),
+        cssPriority: element.style.getPropertyPriority(property)
+      });
+    }
+    if (element.contains(document.activeElement)) inbox.focus();
     if (element.getAttribute(attribute) !== value) element.setAttribute(attribute, value);
+    if (element.getAttribute('aria-hidden') !== 'true') element.setAttribute('aria-hidden', 'true');
+    if (!element.hasAttribute('inert')) element.setAttribute('inert', '');
+    if (value !== 'header' && !element.hasAttribute('hidden')) element.setAttribute('hidden', '');
+    const property = changed.get(element).property;
+    const cssValue = value === 'header' ? 'hidden' : 'none';
+    if (element.style.getPropertyValue(property) !== cssValue || element.style.getPropertyPriority(property) !== 'important') {
+      element.style.setProperty(property, cssValue, 'important');
+    }
+  }
+  function restoreElement(element, original) {
+    original.attributes.forEach((value, name) => {
+      if (value === null) element.removeAttribute(name);
+      else element.setAttribute(name, value);
+    });
+    if (original.cssValue) element.style.setProperty(original.property, original.cssValue, original.cssPriority);
+    else element.style.removeProperty(original.property);
+  }
+  function reconcile() {
+    changed.forEach((original, element) => {
+      if (desired.has(element)) return;
+      restoreElement(element, original);
+      changed.delete(element);
+    });
+    desired.forEach((value, element) => remember(element, value));
+    const hiddenFocus = new Set();
+    const selector = 'a[href], button, input, select, textarea, iframe, [tabindex], [contenteditable="true"], [role="button"], [role="link"], [role="tab"]';
+    desired.forEach((value, element) => {
+      if (element.matches(selector)) hiddenFocus.add(element);
+      element.querySelectorAll(selector).forEach(control => hiddenFocus.add(control));
+    });
+    focusChanged.forEach((original, control) => {
+      if (hiddenFocus.has(control)) return;
+      if (original === null) control.removeAttribute('tabindex');
+      else control.setAttribute('tabindex', original);
+      focusChanged.delete(control);
+    });
+    hiddenFocus.forEach(control => {
+      if (!focusChanged.has(control)) focusChanged.set(control, control.getAttribute('tabindex'));
+      if (control.getAttribute('tabindex') !== '-1') control.setAttribute('tabindex', '-1');
+    });
   }
   function mark(element, value) {
     // Do not touch message content, attachment previews, compose windows, or the new controls.
     if (element === bar || bar.contains(element) ||
         element.closest('[role="main"], [role="dialog"]') ||
         element.querySelector('[role="main"], [role="dialog"]')) return;
-    remember(element, value);
+    desired.set(element, value);
   }
   function simplifyMessageActions() {
-    // Restore old toolbar marks first: Gmail reuses controls when returning to the inbox.
-    changed.forEach((original, element) => {
-      if (element.getAttribute(attribute) !== 'action') return;
-      if (original === null) element.removeAttribute(attribute);
-      else element.setAttribute(attribute, original);
-      changed.delete(element);
-    });
     const main = Array.from(document.querySelectorAll('[role="main"]'))
       .find(element => element.getClientRects().length && element.querySelector('.adn'));
     if (!main) return;
@@ -72,23 +113,29 @@
           .forEach(control => controls.add(control));
       }
     });
-    main.querySelectorAll('.gK [role="button"], .gK button, .ams [role="button"], .ams [role="link"], .ams button, .ams a, .ade[role="button"], .ade [role="button"]')
+    main.querySelectorAll('.gK [role="button"], .gK button, .gK [role="checkbox"][aria-label*="starred" i], .ams[role="link"], .ams [role="button"], .ams [role="link"], .ams button, .ams a, .ade[role="button"], .ade [role="button"], button[aria-label="Print all"], button[aria-label="In new window"], button[aria-label="More message options"]')
       .forEach(control => controls.add(control));
     controls.forEach(control => {
       // Do not filter reply editors, attachment controls, or email-body content.
-      if (control.closest('[role="dialog"], .ip, .aoI, .ii, [contenteditable="true"]')) return;
+      if (control.closest('[role="dialog"], .aoI, .ii, [contenteditable="true"]') ||
+          (control.closest('.ip') && !control.matches('.ams[role="link"]'))) return;
       const label = (control.getAttribute('aria-label') || control.getAttribute('data-tooltip') ||
         control.getAttribute('title') || control.textContent || '').trim();
       const keep = /^(delete|reply|forward|newer|older|previous|next|back to inbox)(?:\s*\(|$)/i.test(label);
-      if (!keep) remember(control, 'action');
+      if (!keep) desired.set(control, 'action');
     });
   }
   function simplify() {
+    desired = new Map();
     document.querySelectorAll('[role="banner"]').forEach(element => mark(element, 'header'));
     // Gmail layout classes are fallbacks for panels without semantic landmarks.
-    document.querySelectorAll('.aeN, .nH.aUx, .bAw, .brC-brG, [role="navigation"]')
+    document.querySelectorAll('.aeN, .aUx, .bAw, .brC-brG, [role="navigation"], [role="complementary"][aria-label="Side panel"], .brC-dA-I-Jw, .inboxsdk__sidebar')
       .forEach(element => mark(element, 'panel'));
+    document.querySelectorAll('.zA > td.apU, .T-KT').forEach(element => {
+      if (!element.closest('.ii, [role="dialog"]')) desired.set(element, 'action');
+    });
     simplifyMessageActions();
+    reconcile();
   }
   let frame = 0;
   const observer = new MutationObserver(() => {
@@ -99,8 +146,11 @@
     if (frame) cancelAnimationFrame(frame);
     const focusNeedsRestoring = bar.contains(document.activeElement);
     changed.forEach((original, element) => {
-      if (original === null) element.removeAttribute(attribute);
-      else element.setAttribute(attribute, original);
+      restoreElement(element, original);
+    });
+    focusChanged.forEach((original, control) => {
+      if (original === null) control.removeAttribute('tabindex');
+      else control.setAttribute('tabindex', original);
     });
     style.remove();
     bar.remove();
@@ -113,6 +163,6 @@
   document.body.append(bar);
   simplify();
   observer.observe(document.body, { childList:true, subtree:true, attributes:true,
-    attributeFilter:['aria-label', 'data-tooltip', 'title', 'class', 'style'] });
+    attributeFilter:['aria-label', 'data-tooltip', 'title', 'class', 'style', 'aria-hidden', 'inert', 'hidden', 'tabindex'] });
   inbox.focus();
 })();

@@ -29,7 +29,7 @@ textarea{box-sizing:border-box;width:100%;height:130px;font-size:16px} li{margin
 <li>Use Inbox to return to your messages. Open messages, download attachments, and reply using Gmail's existing controls.</li>
 <li>Select the bookmark again, or choose Show full Gmail, to restore the full interface. Refreshing also restores it.</li></ol>
 <p>The JAWS shortcut refreshes its view without reloading Gmail. F5 or Ctrl+R reloads Gmail and removes the bookmarklet's changes; select the bookmark again afterward. See <a href="https://www.freedomscientific.com/training/jaws/hotkeys/">Freedom Scientific's JAWS keyboard shortcuts</a>.</p>
-<p>The panels are hidden from keyboard navigation and the accessibility tree as well as visually. The bookmark does not change Gmail settings, send messages, read message contents, or contact another service. It applies only to the current tab until refresh.</p>
+<p>Hidden panels and controls receive aria-hidden, inert, and inline hiding; their focusable controls are removed from the Tab sequence. Show full Gmail restores the original attributes. This is intended to remove the controls from screen-reader navigation as well as visually; verify with your JAWS setup. The bookmark does not change Gmail settings, send messages, read message contents, or contact another service. It applies only to the current tab until refresh.</p>
 <p>Gmail can change its layout. This version has not been verified in a signed-in Gmail account or with JAWS; try it with his usual Gmail view before relying on it. If a panel remains, restore the full view and adjust the source for that layout.</p>
 <p><a href="gmail-simple.js">Readable JavaScript source</a></p>
 </main></body></html>`);
