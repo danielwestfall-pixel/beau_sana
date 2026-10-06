@@ -1,0 +1,60 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { once } from 'node:events';
+import { mkdtemp, readFile, unlink, rmdir, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { CredentialStore } from '../credentials.mjs';
+import { createApp } from '../server.mjs';
+
+test('Windows DPAPI encrypts on disk, restores after reopening and fails closed on corruption', { skip: process.platform !== 'win32' }, async t => {
+  const directory = await mkdtemp(join(tmpdir(), 'beausana-test-'));
+  t.after(async () => { await unlink(join(directory, 'token.dpapi')).catch(err => { if (err.code !== 'ENOENT') throw err; }); await rmdir(directory); });
+  const store = new CredentialStore({ directory });
+  assert.equal(await store.exists(), false);
+  await store.save('fictional-test-token');
+  assert.equal(await store.exists(), true);
+  assert.equal((await readFile(store.path)).includes(Buffer.from('fictional-test-token')), false);
+  assert.equal(await new CredentialStore({ directory }).load(), 'fictional-test-token');
+  await store.save('replacement-test-token'); assert.equal(await store.load(), 'replacement-test-token');
+  await writeFile(store.path, 'damaged'); await assert.rejects(store.load(), /Windows could not/);
+  await store.forget(); await store.forget(); assert.equal(await store.exists(), false);
+});
+
+test('saved-token API validates before saving, never returns credentials, and forget clears sessions', async t => {
+  let saved; let saves = 0;
+  const store = { supported: true, exists: async () => !!saved, save: async value => { saved = value; saves++; }, load: async () => { if (!saved) throw new Error('missing'); return saved; }, forget: async () => { saved = undefined; } };
+  const server = createApp({ credentialStore: store, fetchImpl: async (url, options) => {
+    if (options.headers.Authorization === 'Bearer rejected') return new Response('', { status: 401 });
+    return Response.json({ data: { gid: '10', name: 'Example', workspaces: [] } });
+  } });
+  server.listen(0, '127.0.0.1'); await once(server, 'listening');
+  t.after(() => { server.closeAllConnections(); server.close(); });
+  const base = `http://127.0.0.1:${server.address().port}`;
+  const headers = { 'X-BeauSana': 'local', 'Content-Type': 'application/json' };
+  const post = (path, body) => fetch(base + path, { method: 'POST', headers, body: JSON.stringify(body) });
+  assert.equal((await post('/api/connect', { token: 'rejected', remember: true })).status, 401);
+  assert.equal(saves, 0);
+  const connected = await post('/api/connect', { token: 'fictional', remember: true });
+  assert.equal(connected.status, 200); assert.doesNotMatch(await connected.text(), /fictional/);
+  headers.Cookie = connected.headers.get('set-cookie').split(';')[0];
+  assert.deepEqual(await (await fetch(base + '/api/saved-token', { headers })).json(), { supported: true, saved: true });
+  await post('/api/disconnect', {}); assert.equal(saved, 'fictional');
+  const restored = await post('/api/connect', { useSaved: true }); assert.equal(restored.status, 200);
+  headers.Cookie = restored.headers.get('set-cookie').split(';')[0];
+  assert.equal((await fetch(base + '/api/forget-token', { method: 'POST', body: '{}' })).status, 403);
+  await post('/api/forget-token', {}); assert.equal(saved, undefined);
+  assert.equal((await fetch(base + '/api/session', { headers })).status, 401);
+  assert.equal((await post('/api/connect', { useSaved: true })).status, 400);
+  await post('/api/connect', { token: 'fictional', remember: true });
+  await post('/api/connect', { token: 'different', remember: false }); assert.equal(saved, undefined);
+  store.save = async () => { throw new Error('fictional private diagnostic'); };
+  const failedSave = await post('/api/connect', { token: 'fictional', remember: true });
+  assert.equal(failedSave.status, 200);
+  const failedSaveBody = await failedSave.json();
+  assert.match(failedSaveBody.warning, /Windows could not save/);
+  assert.doesNotMatch(JSON.stringify(failedSaveBody), /fictional|private diagnostic/);
+  assert.equal(saved, undefined);
+  headers.Cookie = failedSave.headers.get('set-cookie').split(';')[0];
+  assert.equal((await fetch(base + '/api/session', { headers })).status, 200);
+});

@@ -1,0 +1,9 @@
+{
+  "name": "beausana",
+  "version": "0.5.1",
+  "private": true,
+  "type": "module",
+  "description": "A simple local interface for tasks assigned to you in Asana",
+  "engines": { "node": ">=22" },
+  "scripts": { "start": "node server.mjs", "test": "node test/run.mjs" }
+}

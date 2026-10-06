@@ -1,0 +1,282 @@
+{
+  "standard": "WCAG 2.2 Level AA (includes Level A)",
+  "scope": "BeauSana local interface source; connect, task-list, task-details and action handlers",
+  "result": "Conformance not established; one confirmed source-level failure and three risks requiring browser reproduction",
+  "browser_automation": "Unavailable: privileged native pipe bridge is not available; browser-client is not trusted",
+  "axe_run": false,
+  "jaws_run": false,
+  "live_server": "HTTP 200 observed at http://127.0.0.1:4317/",
+  "file_hashes": {
+    "public/index.html": "36d2453c9c5190d53a963a79660a12f582fc0e147dc85b9f16f3d852477c5688",
+    "public/style.css": "e73b2e991c361a1e6daa5a89bfd81e98f312e64bc20dfd893cae14c9b9e765dd",
+    "public/app.js": "807eb58e387abf6951d1865a3a044776b6c210aaf63a29c805446ebdfd990346",
+    "server.mjs": "443007cd13028541ea4c5791b733c9ee1e685e3d11561bdc0b4ebfcb2efc5d7b"
+  },
+  "structural_source_checks": [
+    {
+      "check": "Page language",
+      "criteria": [
+        "3.1.1"
+      ],
+      "result": "source-check-pass",
+      "evidence": "html lang=en"
+    },
+    {
+      "check": "Initial page title",
+      "criteria": [
+        "2.4.2"
+      ],
+      "result": "source-check-pass",
+      "evidence": "Initial title in HTML; route titles reviewed in app.js"
+    },
+    {
+      "check": "All input controls have explicit labels",
+      "criteria": [
+        "1.3.1",
+        "3.3.2",
+        "4.1.2"
+      ],
+      "result": "source-check-pass",
+      "evidence": "5 labeled inputs/selects/textareas"
+    },
+    {
+      "check": "Unique static IDs",
+      "criteria": [
+        "1.3.1",
+        "4.1.2"
+      ],
+      "result": "source-check-pass",
+      "evidence": "42 unique IDs; this is not an obsolete 4.1.1 criterion check"
+    },
+    {
+      "check": "ARIA label/help references resolve",
+      "criteria": [
+        "1.3.1",
+        "4.1.2"
+      ],
+      "result": "source-check-pass",
+      "evidence": "6 referenced IDs resolve"
+    },
+    {
+      "check": "Skip link and main landmark",
+      "criteria": [
+        "2.4.1"
+      ],
+      "result": "source-check-pass",
+      "evidence": "Skip link points to focusable main"
+    },
+    {
+      "check": "No positive tabindex in static markup",
+      "criteria": [
+        "2.4.3"
+      ],
+      "result": "source-check-pass",
+      "evidence": "Native DOM order; dynamic focus still needs browser verification"
+    },
+    {
+      "check": "Status and error announcement semantics",
+      "criteria": [
+        "4.1.3",
+        "3.3.1"
+      ],
+      "result": "source-check-pass",
+      "evidence": "Persistent status and alert regions; actual JAWS announcements not tested"
+    },
+    {
+      "check": "No zoom restriction in viewport",
+      "criteria": [
+        "1.4.4"
+      ],
+      "result": "source-check-pass",
+      "evidence": "No maximum-scale or user-scalable restriction; 200% zoom not tested"
+    },
+    {
+      "check": "Token field permits paste",
+      "criteria": [
+        "3.3.8"
+      ],
+      "result": "source-check-pass",
+      "evidence": "No paste prevention or cognitive challenge in local authentication; Asana token creation is external"
+    }
+  ],
+  "contrast_calculations": [
+    {
+      "element": "Body text",
+      "foreground": "#172c27",
+      "background": "#f6f8f5",
+      "ratio": 13.79,
+      "threshold": 4.5,
+      "result": "pass"
+    },
+    {
+      "element": "Body text on cards",
+      "foreground": "#172c27",
+      "background": "#ffffff",
+      "ratio": 14.73,
+      "threshold": 4.5,
+      "result": "pass"
+    },
+    {
+      "element": "Hint/footer text",
+      "foreground": "#495d53",
+      "background": "#f6f8f5",
+      "ratio": 6.61,
+      "threshold": 4.5,
+      "result": "pass"
+    },
+    {
+      "element": "Header secondary text",
+      "foreground": "#495d53",
+      "background": "#ffffff",
+      "ratio": 7.06,
+      "threshold": 4.5,
+      "result": "pass"
+    },
+    {
+      "element": "Links on page",
+      "foreground": "#125642",
+      "background": "#f6f8f5",
+      "ratio": 8.07,
+      "threshold": 4.5,
+      "result": "pass"
+    },
+    {
+      "element": "Task links on cards",
+      "foreground": "#125642",
+      "background": "#ffffff",
+      "ratio": 8.62,
+      "threshold": 4.5,
+      "result": "pass"
+    },
+    {
+      "element": "Primary button text",
+      "foreground": "#ffffff",
+      "background": "#215b46",
+      "ratio": 7.93,
+      "threshold": 4.5,
+      "result": "pass"
+    },
+    {
+      "element": "Secondary button text",
+      "foreground": "#215b46",
+      "background": "#ffffff",
+      "ratio": 7.93,
+      "threshold": 4.5,
+      "result": "pass"
+    },
+    {
+      "element": "Error text",
+      "foreground": "#821c1c",
+      "background": "#fff0ee",
+      "ratio": 8.89,
+      "threshold": 4.5,
+      "result": "pass"
+    },
+    {
+      "element": "Input border / white input",
+      "foreground": "#64786c",
+      "background": "#ffffff",
+      "ratio": 4.72,
+      "threshold": 3,
+      "result": "pass"
+    },
+    {
+      "element": "Input border / page",
+      "foreground": "#64786c",
+      "background": "#f6f8f5",
+      "ratio": 4.42,
+      "threshold": 3,
+      "result": "pass"
+    },
+    {
+      "element": "Focus ring / page",
+      "foreground": "#945b00",
+      "background": "#f6f8f5",
+      "ratio": 5.24,
+      "threshold": 3,
+      "result": "pass"
+    },
+    {
+      "element": "Focus ring / white",
+      "foreground": "#945b00",
+      "background": "#ffffff",
+      "ratio": 5.59,
+      "threshold": 3,
+      "result": "pass"
+    }
+  ],
+  "findings": [
+    {
+      "id": "A11Y-001",
+      "classification": "confirmed-source-failure",
+      "criteria": [
+        "2.2.1"
+      ],
+      "severity": "high",
+      "title": "Eight-hour authentication limit has no adjustment or extension",
+      "evidence": "server.mjs defines SESSION_TTL as eight hours, removes expired sessions and sets a matching cookie lifetime. There is no turn-off/adjust/extend control or advance warning.",
+      "recommendation": "Offer a user-controlled session extension with advance warning and at least 20 seconds to respond, repeatable at least ten times, or allow adjustment/turn-off before the limit starts."
+    },
+    {
+      "id": "A11Y-002",
+      "classification": "source-risk-needs-browser-reproduction",
+      "criteria": [
+        "2.4.3"
+      ],
+      "severity": "medium",
+      "title": "Failed initial task load can leave focus in a hidden view",
+      "evidence": "enterTasks hides the connection view via show('tasks'), but only loadTasks success moves focus to tasks-heading. Its catch branch does not move focus. Slow or failed retrieval after connecting has no immediate focus transfer.",
+      "recommendation": "Move focus to the tasks heading immediately when changing views, independently of request success, and verify failure navigation with a keyboard."
+    },
+    {
+      "id": "A11Y-003",
+      "classification": "source-risk-needs-browser-reproduction",
+      "criteria": [
+        "2.4.3",
+        "2.4.7",
+        "4.1.2"
+      ],
+      "severity": "medium",
+      "title": "Saving disables the focused action controls",
+      "evidence": "saveAction disables the entire task-actions fieldset and reload button. Focus is restored only after the async operation finishes. Native details summaries remain interactive outside disabled form-control semantics.",
+      "recommendation": "Use focus-preserving busy states with explicit activation guards, or move focus to a stable labeled progress element, then test Tab and Shift+Tab during a delayed save."
+    },
+    {
+      "id": "A11Y-004",
+      "classification": "source-risk-needs-browser-reproduction",
+      "criteria": [
+        "1.4.10",
+        "1.4.12"
+      ],
+      "severity": "medium",
+      "title": "Some dynamic strings have no long-word wrapping rule",
+      "evidence": "Instruction, comment and heading text can wrap long words. Uploaded-file list items, project metadata in task-list paragraphs and recipient text in buttons do not explicitly do so.",
+      "recommendation": "Verify long filenames, project names and recipient names at 320 CSS pixels and under text-spacing overrides; add wrapping where overflow is observed."
+    }
+  ],
+  "manual_checks_remaining": [
+    "Keyboard-only connect/demo/list/details, Enter and Space activation, Tab/Shift+Tab order, no trap (2.1.1, 2.1.2, 2.4.3)",
+    "JAWS names, roles, expanded/collapsed states, errors, validation and announcements (1.3.1, 3.3.1, 4.1.2, 4.1.3)",
+    "200% text resize, 400% browser zoom/320 CSS-pixel reflow and text-spacing overrides (1.4.4, 1.4.10, 1.4.12)",
+    "Rendered focus visibility and focus not obscured across scroll positions, including expanded forms (2.4.7, 2.4.11)",
+    "Rendered target dimensions and spacing; account for inline-link exceptions (2.5.8)",
+    "Delayed, failed and ambiguous save/upload responses, expired connection and draft recovery",
+    "Review/correct/reverse actual changes to user-controlled data, particularly handoff (3.3.4)",
+    "Dynamic Asana instructions/comments in other languages and lost rich-text relationships (1.3.1, 3.1.2)",
+    "Forced-colors mode and browser-native controls including file picker",
+    "Full applicable A/AA criterion review before any conformance claim; source checks do not establish overall compliance"
+  ],
+  "not_applicable_to_current_local_UI": [
+    "Prerecorded/live media and audio criteria",
+    "Flashing/moving/auto-updating content criteria",
+    "Dragging, complex gestures and motion actuation",
+    "Hover-only content",
+    "Images of text"
+  ],
+  "references": [
+    "https://www.w3.org/TR/WCAG22/",
+    "https://www.w3.org/WAI/WCAG22/Understanding/timing-adjustable.html",
+    "https://www.w3.org/WAI/WCAG22/Understanding/focus-order.html",
+    "https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html"
+  ]
+}
