@@ -4,6 +4,12 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { DownloadStore, downloadName, DOWNLOAD_LIMIT } from '../downloads.mjs';
+import { AsanaReader } from '../server.mjs';
+test('Asana local save requires actual download URL rather than saving a provider webpage',async()=>{
+  const reader=new AsanaReader('fictional',async url=>Response.json({data:url.pathname.endsWith('/tasks/100')?{gid:'100',assignee:{gid:'10'},workspace:{gid:'20'}}:{parent:{gid:'100'},view_url:'https://app.asana.com/file/200',download_url:null}}));
+  await assert.rejects(reader.attachmentUrl('100','200','10','20',true),/download link is not available/);
+  assert.equal(await reader.attachmentUrl('100','200','10','20'),'https://app.asana.com/file/200');
+});
 test('download filenames are safe Windows names',()=>{
   assert.equal(downloadName('CON.txt'),'_CON.txt');assert(!downloadName('../../bad|name.exe').includes('/'));assert.equal(downloadName('audit.txt... '),'audit.txt');
 });

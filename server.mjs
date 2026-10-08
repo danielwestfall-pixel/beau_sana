@@ -142,11 +142,11 @@ export class AsanaReader {
     }
     return result;
   }
-  async attachmentUrl(gid, attachmentGid, user, workspace) {
+  async attachmentUrl(gid, attachmentGid, user, workspace, downloadOnly = false) {
     await this.task(gid, user, workspace);
     const { data } = await this.get(`/attachments/${attachmentGid}`, { opt_fields: 'parent.gid,download_url,view_url,permanent_url' });
     if (data.parent?.gid !== gid) throw new AppError(403, 'This file does not belong to the selected task.');
-    const url = [data.download_url, data.view_url, data.permanent_url].map(safeAttachmentUrl).find(Boolean);
+    const url = (downloadOnly ? [data.download_url] : [data.download_url, data.view_url, data.permanent_url]).map(safeAttachmentUrl).find(Boolean);
     if (!url) throw new AppError(404, 'A download link is not available for this attachment.');
     return url;
   }
@@ -355,7 +355,7 @@ export function createApp({ fetchImpl = fetch, waitImpl, credentialStore = new C
         const task = await session.client.detail(saveDownload[1], session.profile.gid, workspace);
         const file = task.attachments.find(a => a.gid === saveDownload[2]);
         if (!file || file.resource_subtype && file.resource_subtype !== 'asana') throw new AppError(400, 'Use the file-provider link for this attachment.');
-        const location = await session.client.attachmentUrl(saveDownload[1],saveDownload[2],session.profile.gid,workspace);
+        const location = await session.client.attachmentUrl(saveDownload[1],saveDownload[2],session.profile.gid,workspace,true);
         json(200,{file:await dashboard.downloadStore.save(dashboard.owner(req,res),location,file.name)});return;
       }
       if (url.pathname === '/api/tasks' && req.method === 'GET') {
