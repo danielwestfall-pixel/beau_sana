@@ -1,0 +1,598 @@
+[
+  {
+    "id": "accordion",
+    "name": "Accordion Pattern (Sections With Show/Hide Functionality)",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/accordion/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/accordion/examples/accordion/",
+        "name": "Accordion Example"
+      }
+    ],
+    "keyboard": "Enter/Space toggles the focused heading button. Tab visits each header and visible panel control.",
+    "aria": "Heading containing a button; aria-expanded and aria-controls. Optional region for a panel; name it from its heading.",
+    "javascript": "Toggle panels and update expanded state. Native details/summary is an alternative for simple disclosure.",
+    "screenReader": "Header name and expanded/collapsed state; hidden panel content is excluded."
+  },
+  {
+    "id": "alert",
+    "name": "Alert Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/alert/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/alert/examples/alert/",
+        "name": "Alert Example"
+      }
+    ],
+    "keyboard": "No special keys and no automatic focus move.",
+    "aria": "role=alert for urgent dynamic text. Do not put routine updates in alerts.",
+    "javascript": "Insert or change alert text when the event happens; avoid repeated announcements.",
+    "screenReader": "Urgent update announced while the user stays at their current location."
+  },
+  {
+    "id": "alertdialog",
+    "name": "Alert and Message Dialogs Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/alertdialog/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/alertdialog/examples/alertdialog/",
+        "name": "Alert Dialog Example"
+      }
+    ],
+    "keyboard": "Focus enters the dialog. Tab/Shift+Tab stay inside it. Escape closes where appropriate; restore focus on exit.",
+    "aria": "role=alertdialog; aria-modal=true; accessible name and aria-describedby for the message.",
+    "javascript": "Make background inert, manage opening/closing and focus, and provide response buttons.",
+    "screenReader": "Dialog name, urgent message and available response controls."
+  },
+  {
+    "id": "breadcrumb",
+    "name": "Breadcrumb Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/examples/breadcrumb/",
+        "name": "Breadcrumb design pattern example"
+      }
+    ],
+    "keyboard": "Tab between links; Enter follows a link. No custom arrow navigation.",
+    "aria": "Labelled nav with an ordered list; aria-current=page on the current page link.",
+    "javascript": "None for normal links. Update current page when navigation changes.",
+    "screenReader": "Navigation landmark, ordered ancestry and current-page indication."
+  },
+  {
+    "id": "button",
+    "name": "Button Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/button/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/button/examples/button/",
+        "name": "Button Examples"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/button/examples/button_idl/",
+        "name": "Button Examples (IDL)"
+      }
+    ],
+    "keyboard": "Tab focuses; Enter/Space activates.",
+    "aria": "Prefer button. Toggle buttons use aria-pressed; unavailable buttons use disabled or carefully managed aria-disabled.",
+    "javascript": "Perform the action and manage focus if it opens/closes another context.",
+    "screenReader": "Name, button role and pressed/disabled state. Keep toggle names stable."
+  },
+  {
+    "id": "carousel",
+    "name": "Carousel (Slide Show or Image Rotator) Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/carousel/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/carousel/examples/carousel-1-prev-next/",
+        "name": "Auto-Rotating Image Carousel with Buttons for Slide Control:"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/carousel/examples/carousel-2-tablist/",
+        "name": "Auto-Rotating Image Carousel with Tabs for Slide Control:"
+      }
+    ],
+    "keyboard": "Tab through controls; Enter/Space operates buttons. Stop rotation on focus and hover; restart only by explicit request.",
+    "aria": "Labelled region/group with aria-roledescription=carousel; labelled slides. Tabbed variants also follow the tabs pattern.",
+    "javascript": "Previous/next, pause/resume and slide visibility; hidden slides must not retain focusable controls.",
+    "screenReader": "Carousel and slide identity, rotation control, and manual slide changes without distracting automatic announcements."
+  },
+  {
+    "id": "checkbox",
+    "name": "Checkbox Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/checkbox/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/checkbox/examples/checkbox/",
+        "name": "Checkbox (Two-State) Example"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/checkbox/examples/checkbox-mixed/",
+        "name": "Checkbox (Mixed-State) Example"
+      }
+    ],
+    "keyboard": "Tab focuses; Space toggles.",
+    "aria": "Prefer input type=checkbox and label. Custom checkbox needs aria-checked; mixed represents partial selection.",
+    "javascript": "Native toggling needs no script. Script group aggregation or custom controls.",
+    "screenReader": "Name and checked, unchecked or mixed state."
+  },
+  {
+    "id": "combobox",
+    "name": "Combobox Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/combobox/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-select-only/",
+        "name": "Select-Only Combobox"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-autocomplete-both/",
+        "name": "Editable Combobox with Both List and Inline Autocomplete"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-autocomplete-list/",
+        "name": "Editable Combobox with List Autocomplete"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-autocomplete-none/",
+        "name": "Editable Combobox Without Autocomplete"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/grid-combo/",
+        "name": "Editable Combobox with Grid Popup"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-datepicker/",
+        "name": "Date Picker Combobox"
+      }
+    ],
+    "keyboard": "Tab reaches the combobox. Down Arrow enters suggestions; Enter accepts; Escape dismisses. Preserve normal text-editing keys. Popup variants have additional keys.",
+    "aria": "role=combobox; label; aria-expanded and aria-controls. aria-autocomplete for editable suggestions; aria-activedescendant when input retains focus.",
+    "javascript": "Manage popup, active option, selection, filtering and Escape. Use the exact keyboard model for the chosen popup type.",
+    "screenReader": "Name, editable/select-only role, expanded state, active suggestion and selected value."
+  },
+  {
+    "id": "dialog-modal",
+    "name": "Dialog (Modal) Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/dialog/",
+        "name": "Modal Dialog Example"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/",
+        "name": "Date Picker Dialog Example"
+      }
+    ],
+    "keyboard": "Move focus inside on opening; Tab/Shift+Tab wrap inside; Escape closes; restore focus to opener or a logical successor.",
+    "aria": "Prefer dialog opened with showModal. Give an accessible name. Custom modal: role=dialog and aria-modal=true.",
+    "javascript": "Open/close and set suitable initial focus; background is inert. Include a visible close button.",
+    "screenReader": "Dialog name and contents; background is not reachable while modal. Describe only simple dialog messages."
+  },
+  {
+    "id": "disclosure",
+    "name": "Disclosure (Show/Hide) Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/examples/disclosure-image-description/",
+        "name": "Disclosure (Show/Hide) of Image Description"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/examples/disclosure-faq/",
+        "name": "Disclosure (Show/Hide) of Answers to Frequently Asked Questions"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/examples/disclosure-navigation/",
+        "name": "Disclosure (Show/Hide) Navigation Menu"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/examples/disclosure-navigation-hybrid/",
+        "name": "Disclosure (Show/Hide) Navigation Menu with Top-Level Links"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/examples/disclosure-card/",
+        "name": "Disclosure (Show/Hide) Card"
+      }
+    ],
+    "keyboard": "Enter/Space on the control toggles visibility. Tab visits visible controls.",
+    "aria": "Prefer details/summary; custom button uses aria-expanded and optionally aria-controls.",
+    "javascript": "Native details works without script. Custom version toggles hidden and expanded together.",
+    "screenReader": "Control name and expanded/collapsed state; only shown content is navigable."
+  },
+  {
+    "id": "feed",
+    "name": "Feed Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/feed/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/feed/examples/feed/",
+        "name": "Infinite Scrolling Feed Example"
+      }
+    ],
+    "keyboard": "Recommended: Page Down/Up moves between articles; Ctrl+End/Home exits after/before the feed. Document any custom commands.",
+    "aria": "Named feed; labelled article items with aria-posinset and aria-setsize; aria-busy during updates.",
+    "javascript": "Coordinate article focus with loading/removal; preserve reading position and provide an alternative to infinite scrolling.",
+    "screenReader": "Article identity and position; newly loaded content is available without unexpected focus movement."
+  },
+  {
+    "id": "grid",
+    "name": "Grid (Interactive Tabular Data and Layout Containers) Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/grid/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/grid/examples/layout-grids/",
+        "name": "Layout Grid Examples"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/grid/examples/data-grids/",
+        "name": "Data Grid Examples"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/grid/examples/advanced-data-grid/",
+        "name": "Advanced Data Grid Example"
+      }
+    ],
+    "keyboard": "Arrow keys navigate cells. Home/End and Ctrl+Home/End navigate rows/grid. Tab enters/exits. Editing has a documented enter/exit model.",
+    "aria": "grid, row, gridcell/rowheader/columnheader; label. aria-selected only when selection exists; indices/counts for virtualized data.",
+    "javascript": "Manage one Tab stop, cell focus, optional editing and selection. Use a native table for static data.",
+    "screenReader": "Grid identity, row/column relationships, cell content and any selected/editing state."
+  },
+  {
+    "id": "landmarks",
+    "name": "Landmarks Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/examples/main.html",
+        "name": "Main Landmark Example"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/examples/navigation.html",
+        "name": "Navigation Landmark Example"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/examples/search.html",
+        "name": "Search Landmark Example"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/examples/banner.html",
+        "name": "Banner Landmark Example"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/examples/contentinfo.html",
+        "name": "Contentinfo Landmark Example"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/examples/complementary.html",
+        "name": "Complementary Landmark Example"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/examples/form.html",
+        "name": "Form Landmark Example"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/examples/region.html",
+        "name": "Region Landmark Example"
+      }
+    ],
+    "keyboard": "Use screen-reader landmark commands; interactive descendants use normal Tab order.",
+    "aria": "Prefer main, nav, header, footer, aside. Give distinct names to repeated landmarks; avoid unnecessary regions.",
+    "javascript": "None. Maintain semantic structure when content changes.",
+    "screenReader": "Page regions available in the screen reader landmark list with useful names."
+  },
+  {
+    "id": "link",
+    "name": "Link Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/link/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/link/examples/link/",
+        "name": "Link Examples"
+      }
+    ],
+    "keyboard": "Tab focuses; Enter follows. Native links support browser context menus and opening in another tab.",
+    "aria": "Prefer a with href and meaningful text; aria-current when appropriate.",
+    "javascript": "None for ordinary navigation. Custom role=link alone provides no navigation behavior.",
+    "screenReader": "Link name, destination context and current-page state when applicable."
+  },
+  {
+    "id": "listbox",
+    "name": "Listbox Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/listbox/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/listbox/examples/listbox-scrollable/",
+        "name": "Scrollable Listbox Example"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/listbox/examples/listbox-rearrangeable/",
+        "name": "Example Listboxes with Rearrangeable Options"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/listbox/examples/listbox-grouped/",
+        "name": "Listbox Example with Grouped Options"
+      }
+    ],
+    "keyboard": "Up/Down moves among vertical options. Home/End and type-ahead are recommended for longer lists. Space can toggle multi-selection; document the selection model.",
+    "aria": "listbox with named options and aria-selected (or consistent aria-checked model); aria-multiselectable for multiple choice.",
+    "javascript": "Manage active option and selection using roving tabindex or aria-activedescendant. Options should not contain interactive controls.",
+    "screenReader": "Listbox name, active option, position and selection state."
+  },
+  {
+    "id": "menubar",
+    "name": "Menu and Menubar Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/menubar/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/menubar/examples/menubar-editor/",
+        "name": "Editor Menubar Example"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/menubar/examples/menubar-navigation/",
+        "name": "Navigation Menubar Example"
+      }
+    ],
+    "keyboard": "Arrow keys move between items and submenus; Enter activates; Escape closes and returns focus. Tab exits rather than visiting each item.",
+    "aria": "menu/menubar with menuitem, menuitemcheckbox or menuitemradio. Submenu triggers expose aria-haspopup and aria-expanded.",
+    "javascript": "Manage focus, submenus, wrapping and dismissal. Ordinary site navigation should remain native links.",
+    "screenReader": "Menu identity, item name, submenu availability and checked/disabled states."
+  },
+  {
+    "id": "menu-button",
+    "name": "Menu Button Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/examples/menu-button-actions-active-descendant/",
+        "name": "Action Menu Button Example Using aria-activedescendant"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/examples/menu-button-actions/",
+        "name": "Action Menu Button Example Using element.focus()"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/examples/menu-button-links/",
+        "name": "Navigation Menu Button"
+      }
+    ],
+    "keyboard": "Enter/Space opens menu and focuses its first item. Optional Up/Down opens at last/first. Use menu keys inside.",
+    "aria": "button with aria-haspopup=menu and aria-expanded; menu and menuitem descendants.",
+    "javascript": "Open/close menu, manage item focus and restore focus to button on Escape.",
+    "screenReader": "Button name, menu availability, expanded state and focused menu item."
+  },
+  {
+    "id": "meter",
+    "name": "Meter Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/meter/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/meter/examples/meter/",
+        "name": "Meter Example"
+      }
+    ],
+    "keyboard": "No special keyboard interaction; value is read, not adjusted.",
+    "aria": "Prefer meter. Custom meter needs accessible name, aria-valuenow/min/max; aria-valuetext for useful units.",
+    "javascript": "Update displayed value and semantics together if data changes.",
+    "screenReader": "Named measurement, current value and range/units."
+  },
+  {
+    "id": "radio",
+    "name": "Radio Group Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/radio/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/radio/examples/radio/",
+        "name": "Radio Group Example Using Roving tabindex"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/radio/examples/radio-activedescendant/",
+        "name": "Radio Group Example Using aria-activedescendant"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/radio/examples/radio-rating/",
+        "name": "Rating Radio Group Example"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/examples/toolbar/",
+        "name": "Simple Editor Toolbar Example"
+      }
+    ],
+    "keyboard": "Tab enters/exits group. Outside toolbars, arrows wrap and select; Space selects. Toolbar radio groups use a different arrow/selection model.",
+    "aria": "Prefer same-name radio inputs with fieldset/legend. Custom radiogroup and radio need names and aria-checked.",
+    "javascript": "Native groups work without script. Custom groups manage focus and mutually exclusive selection.",
+    "screenReader": "Group label, option name, checked state and position."
+  },
+  {
+    "id": "slider",
+    "name": "Slider Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/slider/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/slider/examples/slider-color-viewer/",
+        "name": "Color Viewer Slider Example"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/slider/examples/slider-temperature/",
+        "name": "Vertical Temperature Slider Example"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/slider/examples/slider-rating/",
+        "name": "Rating Slider Example"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/slider/examples/slider-seek/",
+        "name": "Media Seek Slider Example"
+      }
+    ],
+    "keyboard": "Right/Up increases; Left/Down decreases. Home/End reaches bounds. Optional Page Up/Down uses larger steps.",
+    "aria": "Prefer input type=range with label; custom slider uses aria-valuenow/min/max and optional aria-valuetext/orientation.",
+    "javascript": "Native range supplies keys. Custom slider handles keys and pointer input, bounds and value updates.",
+    "screenReader": "Slider name, value with useful units, limits and orientation."
+  },
+  {
+    "id": "slider-multithumb",
+    "name": "Slider (Multi-Thumb) Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/slider-multithumb/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/slider-multithumb/examples/slider-multithumb/",
+        "name": "Horizontal Multi-Thumb Slider Example"
+      }
+    ],
+    "keyboard": "Each thumb is a separate Tab stop with slider keys; keep Tab order stable when values cross.",
+    "aria": "Each thumb is a named slider with its own value and limits; update dependent limits if thumbs constrain one another.",
+    "javascript": "Manage thumb focus, keyboard/pointer changes and value dependencies without changing Tab order.",
+    "screenReader": "Distinct thumb names (such as minimum/maximum) and each value/range."
+  },
+  {
+    "id": "spinbutton",
+    "name": "Spinbutton Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/spinbutton/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/spinbutton/examples/quantity-spinbutton/",
+        "name": "Quantity Spin Button Example:"
+      }
+    ],
+    "keyboard": "Up/Down changes value; Home/End reaches defined bounds. Preserve normal text editing. Optional Page Up/Down changes larger steps.",
+    "aria": "Prefer input type=number with label. Custom spinbutton needs aria-valuenow/min/max; aria-valuetext for nonnumeric meaning.",
+    "javascript": "Validate editable values; implement custom stepping and bounds; communicate invalid input.",
+    "screenReader": "Control name, current value, allowed range and invalid state where relevant."
+  },
+  {
+    "id": "switch",
+    "name": "Switch Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/switch/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/switch/examples/switch/",
+        "name": "Switch Example"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/switch/examples/switch-button/",
+        "name": "Switch Example Using HTML Button"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/switch/examples/switch-checkbox/",
+        "name": "Switch Example Using HTML Checkbox Input"
+      }
+    ],
+    "keyboard": "Tab focuses; Space toggles; Enter is optional.",
+    "aria": "Labelled switch with aria-checked=true/false; a checkbox with role=switch uses native checked. Name must remain constant.",
+    "javascript": "Update on/off value and state together. Native checkbox toggles without script.",
+    "screenReader": "Stable name, switch role and on/off state."
+  },
+  {
+    "id": "table",
+    "name": "Table Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/table/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/table/examples/table/",
+        "name": "Table Example"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/table/examples/sortable-table/",
+        "name": "Sortable Table Example"
+      }
+    ],
+    "keyboard": "No custom keyboard model. Use screen-reader table commands and normal Tab for controls in cells.",
+    "aria": "Prefer table, caption, th and scope. Custom table uses row/cell/header roles and indices for partial data.",
+    "javascript": "None for a static table. Sorting must update content and aria-sort on the sorted header.",
+    "screenReader": "Caption, dimensions and associated row/column headers while navigating cells."
+  },
+  {
+    "id": "tabs",
+    "name": "Tabs Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/tabs/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/tabs/examples/tabs-automatic/",
+        "name": "Tabs With Automatic Activation"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/tabs/examples/tabs-manual/",
+        "name": "Tabs With Manual Activation"
+      }
+    ],
+    "keyboard": "Tab enters on active tab. Left/Right moves horizontal tabs; Up/Down for vertical. Enter/Space selects in manual mode. Home/End optional.",
+    "aria": "Named tablist; tabs with aria-selected and aria-controls; tabpanels named by their tabs. Inactive tabs tabindex=-1.",
+    "javascript": "Manage roving focus and panel visibility. Automatic activation only when panels appear without latency.",
+    "screenReader": "Tab name, position, selected state and correctly associated visible panel."
+  },
+  {
+    "id": "toolbar",
+    "name": "Toolbar Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/examples/toolbar/",
+        "name": "Toolbar Example"
+      }
+    ],
+    "keyboard": "One Tab entry; Left/Right navigates horizontal controls, Up/Down vertical. Home/End optional. Inner controls retain relevant activation keys.",
+    "aria": "Named toolbar; aria-orientation for vertical layouts. Controls retain their native roles and states.",
+    "javascript": "Manage roving focus and remember last control if useful. Avoid competing arrow-key widgets without a clear model.",
+    "screenReader": "Toolbar name plus each control name and state."
+  },
+  {
+    "id": "tooltip",
+    "name": "Tooltip Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/tooltip/",
+    "examples": [],
+    "keyboard": "Appears on focus as well as hover; Escape dismisses. Focus remains on trigger.",
+    "aria": "role=tooltip; trigger references text using aria-describedby. Tooltip has no interactive descendants.",
+    "javascript": "Show on focus/hover; dismiss on Escape, blur or pointer exit; remain visible while pointer is over tooltip.",
+    "screenReader": "Supplementary description for the trigger; essential instructions must be available without hover."
+  },
+  {
+    "id": "treeview",
+    "name": "Tree View Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/treeview/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/treeview/examples/treeview-1a/",
+        "name": "File Directory Treeview Example Using Computed Properties"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/treeview/examples/treeview-1b/",
+        "name": "File Directory Treeview Example Using Declared Properties"
+      },
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/treeview/examples/treeview-navigation/",
+        "name": "Navigation Treeview Example"
+      }
+    ],
+    "keyboard": "Right expands or enters children; Left collapses or moves to parent. Up/Down visits visible nodes; Home/End and type-ahead navigate.",
+    "aria": "Named tree with treeitem and nested group; aria-expanded for parents; selected/checked state only when implemented.",
+    "javascript": "Manage visible-node focus, expansion and selection. Keep focus and selection distinct in multi-select trees.",
+    "screenReader": "Node name, hierarchy level, position and expanded/selected state."
+  },
+  {
+    "id": "treegrid",
+    "name": "Treegrid Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/treegrid/",
+    "examples": [
+      {
+        "url": "https://www.w3.org/WAI/ARIA/apg/patterns/treegrid/examples/treegrid-1/",
+        "name": "E-mail Inbox treegrid Example"
+      }
+    ],
+    "keyboard": "Arrow keys navigate hierarchy and cells; Right/Left expands/collapses at appropriate row/first cell. Enter acts; Tab can visit controls in the focused row.",
+    "aria": "Named treegrid with row/gridcell/header roles; aria-expanded on parent rows or first cells; hierarchy and indices for partial data.",
+    "javascript": "Coordinate hierarchical rows, cell/row focus, expansion, editing and selection using the documented variant.",
+    "screenReader": "Cell/header relationships, hierarchy level, expanded and selected states."
+  },
+  {
+    "id": "windowsplitter",
+    "name": "Window Splitter Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/",
+    "examples": [],
+    "keyboard": "Arrows move the separator along its axis. Enter collapses/restores the primary pane. Home/End and F6 pane cycling are optional.",
+    "aria": "Focusable separator; aria-orientation, aria-valuenow/min/max, aria-controls for primary pane; name from that pane.",
+    "javascript": "Resize panes, update value, support keyboard and pointer input, and preserve usable bounds. APG example work is incomplete.",
+    "screenReader": "Splitter name, orientation and primary-pane size/value."
+  }
+]

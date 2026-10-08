@@ -13,5 +13,9 @@ if errorlevel 1 (
   pause
   exit /b 1
 )
-node server.mjs --open
+if exist "slack-config.env" (
+  node --env-file=slack-config.env server.mjs --open
+) else (
+  node server.mjs --open
+)
 pause

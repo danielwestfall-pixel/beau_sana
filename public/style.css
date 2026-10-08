@@ -52,5 +52,17 @@ h1:focus, main:focus { outline: 2px solid #945b00; outline-offset: 5px; }
 .skip { position: absolute; top: -100px; left: 1rem; padding: .7rem 1rem; background: #fff; z-index: 1; }
 .skip:focus { top: .5rem; }
 [hidden] { display: none !important; }
+#site-nav { margin-top: 1rem; }
+#site-nav ul { display: flex; flex-wrap: wrap; gap: .6rem 1.2rem; list-style: none; padding: 0; }
+#site-nav [aria-current="page"], #conversations [aria-current] { font-weight: bold; text-decoration-thickness: 3px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 1rem; padding: 0; list-style: none; }
+.cards > *, .pattern, .messages article { background: #fff; border: 1px solid #c8d2cc; border-radius: 6px; padding: 1rem; }
+.messages { padding-left: 1.7rem; }
+.message-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.messages h3 { font-size: 1rem; }
+.pattern { margin-block: 1rem; }
+.pattern li { line-height: 1.6; }
+.toolbar a { align-self: center; }
+main, button, .tasks p, .cards, #conversations { overflow-wrap: anywhere; }
 @media (max-width: 480px) { .brand span { display: block; margin-left: 0; } h1 { font-size: 1.65rem; } }
 @media (forced-colors: active) { button, .tasks li, input, select { border: 1px solid ButtonText; } :focus-visible { outline-color: Highlight; } }

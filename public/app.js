@@ -1,5 +1,6 @@
 import { moveMentions, mentionQuery } from './mentions.js';
 import { renderContent, safeLink } from './content.js';
+import { saveButton } from './download-control.js';
 const el = id => document.getElementById(id);
 let profile; let demo = false; let tasks = []; let selectedTask; let generation = 0;
 let userStarted = false;
@@ -7,6 +8,7 @@ let currentTask; let saving = false; let demoTasks;
 let mentions = []; let previousComment = ''; let mentionTimer; let mentionVersion = 0; let activeMention;
 let demoFileUrls = [];
 let savedToken = false;
+let deferredHistory = false;
 async function refreshSavedToken() {
   const info = await api('/api/saved-token'); savedToken = info.saved;
   el('remember-token').disabled = !info.supported;
@@ -33,8 +35,15 @@ function resetDemo() {
 resetDemo();
 function status(message) { el('status').textContent = message; }
 function error(message = '') { el('error').textContent = message; }
-function show(view, focusId) {
+function show(view, focusId, record = true) {
   for (const name of ['connect', 'tasks', 'detail']) el(`${name}-view`).hidden = name !== view;
+  if (record && ['tasks','detail'].includes(view)) {
+    const task=view==='detail'?selectedTask:null;
+    if(history.state?.asanaTask!==task){
+      if(view==='tasks' && history.state?.asanaTask===undefined)history.replaceState({...history.state,asanaTask:null},'',location.pathname);
+      else history.pushState({...history.state,beauVisit:true,asanaTask:task,asanaTaskVisit:!!task},'',task?`#task-${task}`:location.pathname);
+    }
+  }
   if (focusId) el(focusId).focus();
 }
 async function api(path, body) {
@@ -84,6 +93,7 @@ async function loadTasks({ focus = false } = {}) {
   } finally { if (version === generation) el('refresh').disabled = false; }
 }
 function enterTasks(focus = true) {
+  document.dispatchEvent(new Event('beau-connection-change'));
   selectedTask = undefined; currentTask = undefined;
   document.title = 'My tasks — BeauSana';
   el('identity').textContent = demo ? 'Demo mode · Example tasks' : `Connected as ${profile.name}`;
@@ -95,14 +105,16 @@ function enterTasks(focus = true) {
     el('workspace').append(option);
   }
   el('workspace-control').hidden = profile.workspaces.length < 2;
-  show('tasks'); tasks = []; renderTasks();
+  const initialTask=location.hash.match(/^#task-(\d+)$/)?.[1];
+  show('tasks', focus ? 'tasks-heading' : undefined, !initialTask); tasks = []; renderTasks();
   if (!profile.workspaces.length) { status(''); error('Your Asana account has no available workspaces.'); if (focus) el('tasks-heading').focus(); return; }
-  loadTasks({ focus });
+  loadTasks({ focus }).then(()=>{if(initialTask)openTask(initialTask,false);});
 }
-async function openTask(gid) {
+async function openTask(gid, record = true) {
   const version = ++generation; error(); status('Loading task instructions.');
   try {
     const task = demo ? demoTasks.find(item => item.gid === gid) : (await api(`/api/tasks/${gid}?workspace=${encodeURIComponent(el('workspace').value)}`)).task;
+    if(!task)throw new Error('This task is no longer available. Return to My tasks.');
     if (version !== generation) return;
     if (selectedTask !== gid) {
       el('description-addition').value = ''; el('comment-text').value = ''; el('upload-file').value = '';
@@ -133,7 +145,7 @@ async function openTask(gid) {
         if (url.protocol === 'https:' && url.hostname === 'app.asana.com') { link.href = url.href; link.hidden = false; }
       } catch { /* No external link for an invalid URL. */ }
     }
-    status(''); show('detail', 'detail-heading');
+    status(''); show('detail', 'detail-heading', record);
   } catch (err) { if (version === generation) { status(''); error(err.message); } }
   finally { if (version === generation) el('refresh').disabled = false; }
 }
@@ -187,10 +199,20 @@ el('disconnect').addEventListener('click', async () => {
 });
 el('back').addEventListener('click', event => {
   if (saving) { event.preventDefault(); return; }
+  if(history.state?.asanaTask && history.state.asanaTaskVisit){event.preventDefault();history.back();return;}
+  history.replaceState({...history.state,asanaTask:null,asanaTaskVisit:false},'',location.pathname);
   event.preventDefault(); ++generation; error(); status(''); document.title = 'My tasks — BeauSana'; show('tasks');
   dismissMentions();
   (el(`task-${selectedTask}`) || el('tasks-heading')).focus();
 });
+function restoreHistory(){
+  if(!profile)return;
+  if(saving){deferredHistory=true;return;}
+  const gid=location.hash.match(/^#task-(\d+)$/)?.[1];
+  if(gid)openTask(gid,false);
+  else{++generation;error();status('');document.title='My tasks — BeauSana';show('tasks',undefined,false);dismissMentions();(el(`task-${selectedTask}`)||el('tasks-heading')).focus();}
+}
+window.addEventListener('popstate',restoreHistory);
 function renderComments() {
   el('comments').replaceChildren();
   const comments = currentTask.comments || [];
@@ -219,6 +241,9 @@ function renderAttachments() {
       link.href = `/api/tasks/${selectedTask}/attachments/${encodeURIComponent(attachment.gid)}/download?workspace=${encodeURIComponent(el('workspace').value)}`;
     }
     li.append(link);
+    if(!demo && (!attachment.resource_subtype || attachment.resource_subtype==='asana')) {
+      li.append(document.createTextNode(' · '),saveButton(name,`/api/tasks/${selectedTask}/attachments/${encodeURIComponent(attachment.gid)}/save?workspace=${encodeURIComponent(el('workspace').value)}`));
+    }
     const viewUrl = safeLink(attachment.view_url || attachment.permanent_url);
     if (!demo && viewUrl) {
       li.append(document.createTextNode(' · '));
@@ -243,6 +268,7 @@ function renderActions() {
 async function saveAction(message, focusId, action) {
   if (saving) return;
   saving = true; error(); status(message);
+  el('status').tabIndex=-1;el('status').focus();
   dismissMentions();
   el('task-actions').disabled = true; el('reload-task').disabled = true; el('back').setAttribute('aria-disabled', 'true');
   let success;
@@ -254,6 +280,7 @@ async function saveAction(message, focusId, action) {
     el('complete-task').disabled = currentTask?.completed === true;
     if (focusId && !el('detail-view').hidden) el(focusId).focus();
     if (success) status(success + (demo ? ' Example task only; Asana was not changed.' : ''));
+    if(deferredHistory){deferredHistory=false;restoreHistory();}
   }
 }
 const actionPath = kind => `/api/tasks/${selectedTask}/${kind}?workspace=${encodeURIComponent(el('workspace').value)}`;

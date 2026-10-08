@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A simple local reader for your assigned Asana tasks.">
+  <title>Connect to Asana — BeauSana</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" type="module"></script>
+  <script src="/nav.js" type="module"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to main content</a>
+  <header><div class="brand">BeauSana <span>Your work, simply.</span></div><nav id="site-nav" aria-label="Main navigation"></nav></header>
+  <main id="main" tabindex="-1">
+    <p id="status" role="status" aria-live="polite" aria-atomic="true"></p>
+    <p id="error" role="alert" aria-atomic="true"></p>
+    <section id="connect-view" aria-labelledby="connect-heading">
+      <h1 id="connect-heading" tabindex="-1">Your Asana tasks</h1>
+      <p>A simple place to read the work assigned to you.</p>
+      <form id="connect-form">
+        <label for="token">Your Asana personal access token</label>
+        <p id="token-help" class="hint">Use a token from your own Asana account. You can optionally remember it, encrypted for this Windows account.</p>
+        <input id="token" type="password" required autocomplete="off" spellcheck="false" aria-describedby="token-help">
+        <label class="check-label"><input id="remember-token" type="checkbox" aria-describedby="remember-help"> Remember my token on this computer</label>
+        <p id="remember-help" class="hint">Next time, BeauSana connects automatically. Use only on your own Windows account. Disconnect keeps the saved token; Forget saved token removes it.</p>
+        <button id="connect-button" type="submit">Connect to Asana</button>
+      </form>
+      <p id="saved-token-status" class="hint" role="status"></p>
+      <div class="toolbar">
+        <button id="use-saved-token" type="button" hidden>Connect with saved token</button>
+        <button id="forget-token" type="button" class="secondary" hidden>Forget saved token</button>
+      </div>
+      <button id="demo-button" type="button" class="secondary">Try with example tasks</button>
+      <details>
+        <summary>How to connect</summary>
+        <ol>
+          <li>Sign into your own Asana account.</li>
+          <li>Open the <a href="https://app.asana.com/0/my-apps" target="_blank" rel="noreferrer">Asana developer console (opens in a new tab)</a> and create a personal access token named BeauSana.</li>
+          <li>Paste the token above and choose Connect to Asana.</li>
+        </ol>
+        <p>Treat the token like a password. It grants your Asana account's access. Actions you submit here update Asana. If remembered, the token is encrypted by Windows and stored in your local user profile.</p>
+        <p>If your organization blocks tokens, your Asana administrator will need to allow one or arrange an OAuth connection.</p>
+      </details>
+    </section>
+    <section id="tasks-view" hidden aria-labelledby="tasks-heading">
+      <h1 id="tasks-heading" tabindex="-1">My tasks</h1>
+      <p id="identity" class="hint"></p>
+      <div id="workspace-control" hidden>
+        <label for="workspace">Workspace</label>
+        <select id="workspace"></select>
+      </div>
+      <div class="toolbar">
+        <button id="refresh" type="button">Refresh tasks</button>
+        <button id="disconnect" type="button" class="secondary">Disconnect</button>
+        <button id="forget-token-connected" type="button" class="secondary" hidden>Forget saved token and disconnect</button>
+      </div>
+      <p id="updated" class="hint"></p>
+      <p id="task-summary"></p>
+      <ul id="task-list" class="tasks"></ul>
+    </section>
+    <section id="detail-view" hidden aria-labelledby="detail-heading">
+      <a id="back" href="#tasks-heading">Back to my tasks</a>
+      <h1 id="detail-heading" tabindex="-1"></h1>
+      <dl id="task-meta"></dl>
+      <h2>Instructions</h2>
+      <div id="instructions" class="instructions"></div>
+      <h2>Attached files</h2>
+      <p id="attachments-help" class="hint"></p>
+      <ul id="attachments" class="attachments"></ul>
+      <button id="reload-task" type="button" class="secondary">Reload task</button>
+      <h2>Work on this task</h2>
+      <p id="action-help" class="hint">Each submitted action saves directly to Asana.</p>
+      <fieldset id="task-actions">
+        <legend class="sr-only">Task actions</legend>
+        <details>
+          <summary>Complete this task</summary>
+          <p id="complete-help">Mark this task complete in Asana when your work is finished. It will leave your unfinished task list.</p>
+          <button id="complete-task" type="button" aria-describedby="complete-help">Mark task complete</button>
+        </details>
+        <details>
+          <summary>Add to the description</summary>
+          <form id="description-form">
+            <label for="description-addition">Text to add</label>
+            <p id="description-help" class="hint">Your text will be added after the existing instructions.</p>
+            <textarea id="description-addition" rows="4" maxlength="10000" required aria-describedby="description-help"></textarea>
+            <button type="submit">Add to description</button>
+          </form>
+        </details>
+        <details>
+          <summary>Make a comment</summary>
+          <form id="comment-form">
+            <label for="comment-text">Comment</label>
+            <p id="mention-help" class="hint">Type @ and a name, then Tab to the suggestions and press Enter to select a person. Escape dismisses suggestions. Selected people will be added as task collaborators so Asana can notify them. An unselected @name stays plain text.</p>
+            <textarea id="comment-text" rows="4" maxlength="10000" required aria-describedby="mention-help" aria-controls="mention-suggestions"></textarea>
+            <div id="mention-panel" hidden>
+              <p id="mention-status" role="status" aria-live="polite" aria-atomic="true"></p>
+              <ul id="mention-suggestions" aria-label="People to mention"></ul>
+            </div>
+            <p id="selected-mentions" class="hint" role="status" aria-live="polite" aria-atomic="true"></p>
+            <button type="submit">Post comment</button>
+          </form>
+        </details>
+        <details>
+          <summary>Upload a file</summary>
+          <form id="file-form">
+            <label for="upload-file">File to attach</label>
+            <p id="file-help" class="hint">Choose a non-empty file of 25 MiB or smaller.</p>
+            <input id="upload-file" type="file" required aria-describedby="file-help">
+            <button type="submit">Upload to this task</button>
+          </form>
+          <ul id="uploaded-files"></ul>
+        </details>
+        <details>
+          <summary>Hand back the task</summary>
+          <p id="handoff-help"></p>
+          <button id="handoff" type="button" disabled>Hand back</button>
+        </details>
+      </fieldset>
+      <h2>Comments</h2>
+      <p id="comments-help"></p>
+      <ul id="comments" class="comments"></ul>
+      <a id="asana-link" target="_blank" rel="noreferrer" hidden>Open this task in Asana (opens in a new tab)</a>
+    </section>
+    <noscript><p>This app needs JavaScript enabled to connect to Asana and display your tasks.</p></noscript>
+  </main>
+  <footer>Local Asana workspace</footer>
+</body>
+</html>

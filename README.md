@@ -1,13 +1,52 @@
 # BeauSana
 
-A local interface for unfinished tasks assigned to the connected Asana user. Read instructions, add description text, post comments, attach files, hand work back, and complete tasks. Designed around standard browser controls and a short navigation path for Windows screen-reader users.
+A local Windows dashboard for Slack, assigned Asana tasks, test-server links and accessibility references. It uses ordinary links, labelled forms, headings, visible focus and restrained status announcements.
+
+## Dashboard and Slack
+
+Start the app using **Start BeauSana.cmd**, then choose **Slack messages**, **Asana tasks**, or **Quick links and references**. The dashboard checks connections and updates when opened. **Check updates now** checks again; optionally enable checks every two minutes while the dashboard is visible. New notices appear in a list without moving focus. Slack checks include the default channel, newly opened conversations, and summaries for up to 20 active DMs per check to limit API traffic. These are polling notices, not OS notifications; notices reset when the dashboard page reloads. Opening messages does not change Slack's own read marker. Local reading markers help avoid repeated initial notices on this browser.
+
+Slack's default workspace is **quavered.slack.com**, default channel **#a11y-auditing**, ID **C0C7Q7AJT7Y**. Users authorize their own accounts through OAuth; no Slack PAT or token is pasted into the browser. **Try example conversations** works before a Slack app is configured. Example sends, replies, files and reactions stay in memory and never reach Slack.
+
+The Slack page lists the default channel and existing active DMs. Conversation links and thread links use browser history; Back returns between threads, conversations and pages. Messages have **Thumbs up**, **Seen (eyes)** and **Done (check mark)** toggle responses, ordinary Slack reactions visible to other participants. Use **Send message** to submit; Enter in the text box adds a new line. Thread replies and file uploads target the conversation selected at submission even if navigation changes while the request finishes. Drafts remain in memory per conversation/thread until disconnect or page reload. Refreshing messages rebuilds the list; if JAWS retains an old virtual buffer, press **Insert+Esc** (desktop layout) or **Caps Lock+Esc** (laptop layout).
+
+### Administrator: enable Slack login
+
+1. Create an internal Slack app in the QuaverEd workspace at [Slack app management](https://api.slack.com/apps). Workspace policy may require an owner/admin to approve installation. Start with the scopes and settings in `slack-app-manifest.example.json`, or configure them manually.
+2. In **OAuth & Permissions**, add these **User Token Scopes**, not bot scopes:
+   - `channels:read`, `channels:history`: locate/read the default public channel.
+   - `im:read`, `im:history`: list active DMs and read their messages.
+   - `users:read`: resolve participant names.
+   - `chat:write`: send messages and thread replies as the user.
+   - `files:read`, `files:write`: download Slack-hosted files and share uploads.
+   - `reactions:read`, `reactions:write`: message responses.
+3. If **#a11y-auditing is private**, also add `groups:read`, `groups:history`, and set `SLACK_PRIVATE_CHANNEL=true`. If group DMs are needed, add `mpim:read`, `mpim:history`, and set `SLACK_GROUP_DMS=true`. The user must already be a member of the default channel. New DMs are opened in Slack itself; the dashboard lists existing ones.
+4. Obtain a stable **HTTPS callback URL** whose `/api/slack/oauth/callback` path forwards to this Windows app at `http://127.0.0.1:4317/api/slack/oauth/callback`. An IT-managed HTTPS reverse proxy/tunnel can do this. It must preserve the configured callback Host header. Register that **exact HTTPS URL** in Slack's Redirect URLs. Slack requires HTTPS for this OAuth callback; a public static webpage alone cannot exchange the code securely. Keep other app paths local; the server rejects external Host headers except this callback path. Use a separate callback destination per local installation.
+5. Copy `slack-config.example.env` to **slack-config.env**. Privately fill in **SLACK_CLIENT_ID**, **SLACK_CLIENT_SECRET** from Basic Information and **SLACK_REDIRECT_URI**. Leave the workspace/channel defaults; the workspace team ID is optional. Never put the client secret in HTML or send it in chat. The actual config file is gitignored, but contains a plaintext app secret: keep it on the trusted Windows account and exclude it from shared ZIPs.
+6. Restart **Start BeauSana.cmd**. Select **Connect Slack**, sign in to QuaverEd and approve the requested permissions. The callback exchanges the code on the server, validates the workspace/user and returns to the original local browser session using a short-lived, one-use ticket. The user token never appears in the browser response.
+
+The app's UI/server limits access to the configured channel and the user's DMs. Slack OAuth permissions themselves cover more conversations available to that user; they cannot be scoped to just one channel. No admin, email-address, channel-join, channel-management or bot-impersonation permission is requested. No Events API subscription or incoming webhook is required. Slack API rate limits are announced; sends/uploads are not automatically retried because that could create duplicates. File sharing uses [Slack's external upload flow](https://docs.slack.dev/reference/methods/files.getUploadURLExternal/) and completion, rather than retired `files.upload`. See [Slack OAuth setup](https://docs.slack.dev/authentication/installing-with-oauth/).
+
+Local connections initially last eight hours. Each page provides **Keep connections active for eight more hours**, repeatable without a fixed limit, plus a status warning within the final ten minutes. Unfinished drafts remain only in the page's memory; copy important drafts before reloading. Slack workspace retention, external file-provider permissions and organization policies still apply.
+
+**Remember my Slack connection** encrypts the user/refresh credentials with Windows DPAPI in `%LOCALAPPDATA%\BeauSana\Slack\token.dpapi`. Restore using **Use saved Slack connection**. Disconnect retains the saved credential; Forget deletes it on this PC and disconnects app sessions, but does not revoke Slack authorization. Revoke the app in Slack when needed. Token rotation is supported when enabled for the Slack app. The client ID/secret/callback remain administrator configuration; saved user credentials do not replace them.
+
+### Downloads and references
+
+Slack **Download** and native Asana **Save to computer** save up to 25 MiB to `%USERPROFILE%\Downloads\BeauSana`, using unique filenames. The resulting **Show in Explorer** button selects the actual saved file in Windows Explorer. It never runs the downloaded file. The Downloads page lists files from the current local app session; files remain on disk after restarting. External provider attachments must be accessed in their provider. Ordinary browser downloads continue to use the browser's own download list, not the app's Explorer button.
+
+Quick links reserve **Live, Alpha, Beta, Dev and Patch** without inventing URLs. When the spreadsheet is ready, add entries to `public/quick-links.json` using `{"name":"Live","url":"https://your-real-server/"}`. Only safe web links are rendered.
+
+The searchable component library covers the [30 current APG patterns](https://www.w3.org/WAI/ARIA/apg/patterns/), with short keyboard, screen-reader, ARIA and JavaScript notes. Expand **Official examples** to open the actual W3C examples. **Copy APG link** copies the relevant pattern; a selected text field provides a Ctrl+C fallback if clipboard access fails. These are comparison references, not 30 locally reimplemented widgets. The window-splitter pattern currently lacks a completed APG example. JAWS Surf's Up training links are included; some training pages deliberately contain problematic markup and older browser instructions.
+
+This version is a local app, not a multi-user hosted service. Windows Explorer support requires the local Windows process. A shared web deployment would need separate user sessions, encrypted server-side credentials and a local download helper before it could provide that feature.
 
 ## Start on Windows
 
 1. Install Node.js 22 or newer if it is not already installed.
 2. Select **Start BeauSana.cmd** in File Explorer and press **Enter**. Keep the terminal window open while using the app.
 3. Your browser opens at **http://127.0.0.1:4317** once the server is ready.
-4. Choose **Try with example tasks** to explore without connecting an account.
+4. Choose **Asana tasks**, then **Try with example tasks**, or **Slack messages**, then **Try example conversations**, to explore without connecting an account.
 5. To use real tasks, create a personal access token from **the contractor's own Asana account** at [Asana's developer console](https://app.asana.com/0/my-apps), paste it into the password field, and choose **Connect to Asana**. If multiple workspaces are available, choose the right one.
 
 Alternatively, run `npm start` in this folder. No package installation is required. To move the app to another Windows computer, copy this folder; Node.js must be installed there too.
@@ -69,4 +108,6 @@ To host the installer on a website, upload `gmail-bookmarklet.html`. Upload `gma
 
 ## App validation
 
-Run `npm test` for API and local-server tests with simulated Asana responses, including rich-description preservation, stale-description rejection, comments, multipart file relay, previous-assignee identification, and preventing updates after reassignment. Live account verification requires the contractor's token. A real JAWS trial is required before claiming screen-reader compatibility; verify connecting, workspace selection, refreshing, reading long instructions, returning to the list, each action, errors, and disconnecting with his settings.
+Run `npm test` for API, OAuth/session, download security and Windows credential tests with simulated Slack/Asana responses. To run DOM interaction tests, install development dependencies with `npm ci`, then run `npm run test:ui`. Runtime use still needs only Node.js; no package installation is required. DOM tests cover Slack reactions/threads/drafts, an in-flight send during navigation, component filtering/copy fallback, resource-link safety and Asana Back/Forward.
+
+Live Slack verification needs the configured app and user authorization. A real JAWS trial is required before claiming screen-reader compatibility: check headings/landmarks, connecting, conversations and threads, Back/Forward, message responses, file upload/download/Explorer, clipboard fallback, long messages, errors and disconnect with his JAWS settings. Gmail is outside this dashboard's scope; the earlier standalone bookmarklet files remain available.

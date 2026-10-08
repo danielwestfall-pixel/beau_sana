@@ -1,0 +1,3 @@
+import{api,error,status,action}from'./nav.js';import{revealButton}from'./download-control.js';
+async function load(){const r=await api('/api/downloads');const list=document.getElementById('download-list');list.replaceChildren();for(const file of r.files){const li=document.createElement('li'),p=document.createElement('p');p.textContent=`${file.name} · ${new Date(file.created).toLocaleString()}`;li.append(p);if(r.explorerSupported)li.append(revealButton(file));else li.append('Show in Explorer requires Windows.');list.append(li);}status(r.files.length?`${r.files.length} downloaded files.`:'No files saved during this app session.');}
+document.getElementById('downloads-refresh').addEventListener('click',e=>action(e.currentTarget,load));load().catch(e=>error(e.message));

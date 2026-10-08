@@ -5,3 +5,4 @@ coverage/
 *.dpapi
 *.dpapi.*.tmp
 BeauSana.zip
+slack-config.env

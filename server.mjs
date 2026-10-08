@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 import { CredentialStore } from './credentials.mjs';
+import { createDashboardServices } from './dashboard-server.mjs';
 
 const API = 'https://app.asana.com/api/1.0';
 const SESSION_TTL = 8 * 60 * 60 * 1000;
@@ -50,6 +51,10 @@ const assets = new Map([
   ['/mentions.js', ['public/mentions.js', 'text/javascript; charset=utf-8']],
   ['/content.js', ['public/content.js', 'text/javascript; charset=utf-8']],
   ['/style.css', ['public/style.css', 'text/css; charset=utf-8']],
+  ...['asana', 'slack', 'resources', 'components', 'downloads'].map(name => [`/${name}.html`, [`public/${name}.html`, 'text/html; charset=utf-8']]),
+  ...['nav', 'dashboard', 'slack-ui', 'resources', 'components', 'downloads-ui', 'download-control'].map(name => [`/${name}.js`, [`public/${name}.js`, 'text/javascript; charset=utf-8']]),
+  ['/quick-links.json', ['public/quick-links.json', 'application/json; charset=utf-8']],
+  ['/patterns.json', ['public/patterns.json', 'application/json; charset=utf-8']],
 ]);
 class AppError extends Error {
   constructor(status, message) { super(message); this.status = status; }
@@ -242,7 +247,8 @@ async function readBody(req) {
   try { return JSON.parse(body); } catch { throw new AppError(400, 'Could not read the submitted information.'); }
 }
 
-export function createApp({ fetchImpl = fetch, waitImpl, credentialStore = new CredentialStore() } = {}) {
+export function createApp({ fetchImpl = fetch, waitImpl, credentialStore = new CredentialStore(), dashboardOptions = {} } = {}) {
+  const dashboard = createDashboardServices({ fetchImpl, ...dashboardOptions });
   const sessions = new Map();
   const writing = new Set();
   const cleanup = setInterval(() => {
@@ -259,10 +265,11 @@ export function createApp({ fetchImpl = fetch, waitImpl, credentialStore = new C
     };
     try {
       const expectedHost = `127.0.0.1:${server.address().port}`;
-      if (req.headers.host !== expectedHost) throw new AppError(403, 'Open this app using its 127.0.0.1 address.');
       const origin = `http://${expectedHost}`;
-      if (req.headers.origin && req.headers.origin !== origin) throw new AppError(403, 'This request must come from the local app.');
       const url = new URL(req.url, origin);
+      const oauthCallback = dashboard.isCallback(url, req);
+      if (req.headers.host !== expectedHost && !oauthCallback) throw new AppError(403, 'Open this app using its 127.0.0.1 address.');
+      if (req.headers.origin && req.headers.origin !== origin && !oauthCallback) throw new AppError(403, 'This request must come from the local app.');
       if (assets.has(url.pathname) && req.method === 'GET') {
         const [path, type] = assets.get(url.pathname);
         res.writeHead(200, { 'Content-Type': type });
@@ -272,9 +279,24 @@ export function createApp({ fetchImpl = fetch, waitImpl, credentialStore = new C
       // Custom header forces cross-origin requests to preflight; no CORS is enabled.
       const download = req.method === 'GET' && url.pathname.match(/^\/api\/tasks\/(\d+)\/attachments\/(\d+)\/download$/);
       // Download links use normal browser navigation with the same HttpOnly session cookie.
-      if (!download && req.headers['x-beausana'] !== 'local') throw new AppError(403, 'This request must come from the local app.');
+      const oauthNavigation = req.method === 'GET' && ['/api/slack/oauth/callback','/api/slack/oauth/finish'].includes(url.pathname);
+      if (!download && !oauthNavigation && req.headers['x-beausana'] !== 'local') throw new AppError(403, 'This request must come from the local app.');
+      if (await dashboard.handle(req,res,url,{json,readBody,readFileBody,localOrigin:origin})) return;
       const cookie = req.headers.cookie?.match(/(?:^|;\s*)beausana=([a-f0-9]{64})(?:;|$)/)?.[1];
       const session = cookie && sessions.get(cookie);
+      if(url.pathname === '/api/connection-limits' && req.method==='GET'){
+        json(200,{asana:session?.expires>Date.now()?session.expires:undefined,slack:dashboard.limit(req)});return;
+      }
+      if(url.pathname === '/api/extend-session' && req.method==='POST'){
+        const cookies=[];
+        if(session?.expires>Date.now()){
+          session.expires=Date.now()+SESSION_TTL;
+          cookies.push(`beausana=${cookie}; HttpOnly; SameSite=Strict; Path=/; Max-Age=28800`);
+        }
+        const slackCookie=dashboard.extend(req);if(slackCookie)cookies.push(slackCookie);
+        if(!cookies.length)throw new AppError(401,'Reconnect to extend your connection. Your drafts remain on this page.');
+        res.setHeader('Set-Cookie',cookies);json(200,{asana:session?.expires>Date.now()?session.expires:undefined,slack:dashboard.limit(req)});return;
+      }
       if (url.pathname === '/api/saved-token' && req.method === 'GET') {
         json(200, { supported: credentialStore.supported, saved: await credentialStore.exists() }); return;
       }
@@ -328,6 +350,14 @@ export function createApp({ fetchImpl = fetch, waitImpl, credentialStore = new C
         const location = await session.client.attachmentUrl(download[1], download[2], session.profile.gid, workspace);
         res.writeHead(302, { Location: location }); res.end(); return;
       }
+      const saveDownload = url.pathname.match(/^\/api\/tasks\/(\d+)\/attachments\/(\d+)\/save$/);
+      if (saveDownload && req.method === 'POST') {
+        const task = await session.client.detail(saveDownload[1], session.profile.gid, workspace);
+        const file = task.attachments.find(a => a.gid === saveDownload[2]);
+        if (!file || file.resource_subtype && file.resource_subtype !== 'asana') throw new AppError(400, 'Use the file-provider link for this attachment.');
+        const location = await session.client.attachmentUrl(saveDownload[1],saveDownload[2],session.profile.gid,workspace);
+        json(200,{file:await dashboard.downloadStore.save(dashboard.owner(req,res),location,file.name)});return;
+      }
       if (url.pathname === '/api/tasks' && req.method === 'GET') {
         json(200, { tasks: await session.client.tasks(workspace, session.profile.gid) }); return;
       }
@@ -371,7 +401,7 @@ export function createApp({ fetchImpl = fetch, waitImpl, credentialStore = new C
       json(error.status || 500, { error: error.status ? error.message : 'Something went wrong. Please try again.' });
     }
   });
-  server.on('close', () => { clearInterval(cleanup); sessions.clear(); });
+  server.on('close', () => { clearInterval(cleanup); sessions.clear(); dashboard.close(); });
   return server;
 }
 

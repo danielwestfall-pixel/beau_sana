@@ -1,9 +1,18 @@
 {
   "name": "beausana",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "private": true,
   "type": "module",
-  "description": "A simple local interface for tasks assigned to you in Asana",
-  "engines": { "node": ">=22" },
-  "scripts": { "start": "node server.mjs", "test": "node test/run.mjs" }
+  "description": "A screen-reader-oriented local Slack, Asana and accessibility reference dashboard",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node test/run.mjs",
+    "test:ui": "node --experimental-vm-modules test/ui.test.mjs"
+  },
+  "devDependencies": {
+    "jsdom": "^30.1.2"
+  }
 }
